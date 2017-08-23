@@ -76,7 +76,6 @@ end
 
 # Begin server configuration
 
-package 'openssl'
 include_recipe 'php-fpm'
 
 # For Ubuntu 14.04 Upstart bug where PHP service does not respond

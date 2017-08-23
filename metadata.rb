@@ -8,7 +8,6 @@ source_url       'https://github.com/nollieheel/app-php-fpm'
 issues_url       'https://github.com/nollieheel/app-php-fpm/issues'
 version          '0.1.0'
 
-depends 'openssl', '~> 4.4.0'
 depends 'php-fpm', '~> 0.7.5'
 depends 'mariadb', '~> 0.3.1'
 depends 'postfix', '~> 3.6.2'
