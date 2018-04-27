@@ -1,6 +1,6 @@
 # app-php-fpm cookbook
 
-A wrapper cookbook that installs PHP-FPM, mariadb client, and postfix on a node.
+A wrapper cookbook that installs PHP-FPM, Mariadb client, and Postfix on a node.
 
 ## Supported Platforms
 
@@ -27,18 +27,6 @@ Ubuntu 14.04
     <td>Whether to delete the default pool named 'www'</td>
     <td><tt>true</tt></td>
   </tr>
-  <tr>
-    <td><tt>['app-php-fpm']['exts']</tt></td>
-    <td>Array</td>
-    <td>PHP modules to install. Array of module names without the 'php5-' prefixes.</td>
-    <td><tt>['mysqlnd', 'cli', 'curl', 'zip']</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['app-php-fpm']['postfix']['update_cacert']</tt></td>
-    <td>Boolean</td>
-    <td>Whether to get the latest cacert from https://curl.haxx.se/ca/cacert.pem for postfix use.</td>
-    <td><tt>true</tt></td>
-  </tr>
 </table>
 
 ## Usage
@@ -53,6 +41,20 @@ Include `app-php-fpm` in your node's `run_list`:
     "recipe[app-php-fpm::default]"
   ]
 }
+```
+
+## Resources
+
+### app_php_fpm_exts
+
+Use in recipe to install PHP extensions:
+
+```ruby
+app_php_fpm_exts 'mcrypt'
+```
+
+```ruby
+app_php_fpm_exts ['mysqlnd', 'cli', 'curl', 'zip']
 ```
 
 ## License and Authors

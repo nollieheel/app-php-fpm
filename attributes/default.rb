@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Attribute:: default
 #
-# Copyright (C) 2017, Earth U
+# Copyright (C) 2018, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,18 +21,18 @@
 default['app-php-fpm']['version'] = '5.6' # or '5.5'
 default['app-php-fpm']['delete_pool_www'] = true
 
-default['app-php-fpm']['exts'] =
+default['app-php-fpm']['exts']['rhel_only'] = %w{ xml mbstring }
+
+# This array of default php extensions actually
+# does nothing. Use the custom resource app_php_fpm_exts
+# to install extensions in your wrapper cookbook.
+default['app-php-fpm']['exts']['default'] =
   case node['app-php-fpm']['version'].to_f
   when 5.5
     %w{ mysqlnd cli curl }
   when 5.6
     %w{ mysqlnd cli curl zip }
   end
-
-default['app-php-fpm']['exts_rhel_only'] = %w{ xml mbstring }
-default['app-php-fpm']['exts_debian_enmod_required'] = %w{ mcrypt }
-
-default['app-php-fpm']['postfix']['update_cacert'] = true
 
 default['php-fpm']['skip_repository_install']     = true
 default['php-fpm']['emergency_restart_threshold'] = '10'
@@ -43,8 +43,8 @@ default['php-fpm']['pools'] = [
     # Required attributes:
     :name   => 'example_pool',
     :enable => true,
-    :listen => '/var/run/php-fpm.sock',
-    #:listen => '127.0.0.1:9000',
+    :listen => '127.0.0.1:9000',
+    #:listen => '/var/run/php-fpm.sock',
 
     # Optional attributes with their defaults:
 
@@ -67,18 +67,37 @@ default['php-fpm']['pools'] = [
     #:php_options => {
     #  'php_admin_value[cgi.fix_pathinfo]' => '0',
     #  'php_admin_value[expose_php]'       => 'Off',
-    #  'php_value[upload_max_filesize]'    => '5M',
+    #  'php_value[upload_max_filesize]'    => '10M',
     #  'php_value[post_max_size]'          => '10M'
     #}
   }
 ]
 
-default['mariadb']['install']['type']        = 'package'
-default['mariadb']['install']['version']     = '10.0'
-default['mariadb']['use_default_repository'] = true
+default['mariadb']['install']['type']             = 'package'
+default['mariadb']['install']['version']          = '10.1'
+default['mariadb']['client']['development_files'] = true
+default['mariadb']['use_default_repository']      = true
+# Get repos here: https://downloads.mariadb.org/mariadb/repositories/#mirror=utm
+default['mariadb']['apt_repository']['base_url'] =
+  'nyc2.mirrors.digitalocean.com/mariadb/repo' # 10.1, New York
+  #'sfo1.mirrors.digitalocean.com/mariadb/repo' # 10.1, San Francisco
 
-default['postfix']['main']['myhostname']    = 'example.com'
-default['postfix']['main']['mydomain']      = 'example.com'
-default['postfix']['main']['myorigin']      = '$mydomain'
-default['postfix']['main']['mydestination'] =
-  %w{ localhost.localdomain localhost }
+# Use below for localhost mailserver:
+#default['postfix']['main']['myhostname']    = 'example.com'
+#default['postfix']['main']['mydomain']      = 'example.com'
+#default['postfix']['main']['myorigin']      = '$mydomain'
+#default['postfix']['main']['mydestination'] =
+#  %w{ localhost.localdomain localhost }
+
+# Use below for AWS SES:
+#default['postfix']['master']['relay']['args'] = []
+#
+#default['postfix']['main']['smtp_use_tls']                 = 'yes'
+#default['postfix']['main']['smtp_tls_security_level']      = 'encrypt'
+#default['postfix']['main']['smtp_tls_note_starttls_offer'] = 'yes'
+#
+#default['postfix']['main']['smtp_sasl_auth_enable'] = 'yes'
+#override['postfix']['sasl']['smtp_sasl_user_name']  = 'theusername'
+#override['postfix']['sasl']['smtp_sasl_passwd']     = 'thepassword'
+#override['postfix']['main']['relayhost'] =
+#  '[email-smtp.us-east-1.amazonaws.com]:25'

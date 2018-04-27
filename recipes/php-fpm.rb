@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Recipe:: php-fpm
 #
-# Copyright (C) 2017, Earth U
+# Copyright (C) 2018, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ if node['php-fpm']['pools']
   def_php_opts = {
     'php_admin_value[cgi.fix_pathinfo]' => '0',
     'php_admin_value[expose_php]'       => 'Off',
-    'php_value[upload_max_filesize]'    => '5M',
+    'php_value[upload_max_filesize]'    => '10M',
     'php_value[post_max_size]'          => '10M'
   }
 

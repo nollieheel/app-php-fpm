@@ -1,3 +1,18 @@
+## 0.2.0 - 2018-04-28
+### Removed
+- Removed recipe php-fpm_exts.
+- Removed recipes mariadb_client and postfix. Replaced those with
+include_recipe calls to respective wrapped cookbooks.
+
+### Added
+- New custom resource app_php_fpm_exts for installing PHP extensions.
+- Correct repo sources for MariaDB packages.
+
+### Changed
+- Bumped versions of dependency cookbooks.
+- Minor adjustments to default attribute values.
+- Added some commented-out attributes in attributes file just for reference.
+
 ## 0.1.2 - 2017-09-05
 ### Fixed
 - Updated metadata version number.
