@@ -1,3 +1,8 @@
+## 1.0.0 - 2018-05-04
+### Changed
+- Now depends on php-fpm cookbook v0.8.0.
+- Remove support for EOL Ubuntu.
+
 ## 0.2.0 - 2018-04-28
 ### Removed
 - Removed recipe php-fpm_exts.

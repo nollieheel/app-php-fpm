@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Resource:: exts
 #
-# Copyright (C) 2017, Earth U
+# Copyright (C) 2018, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

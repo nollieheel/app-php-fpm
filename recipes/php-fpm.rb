@@ -49,10 +49,7 @@ if node['app-php-fpm']['version'] == '5.6'
 end
 
 if node['php-fpm']['pools']
-  def_pm = value_for_platform(
-    'ubuntu'  => { '10.04' => 'dynamic' },
-    'default' => 'ondemand'
-  )
+  def_pm = 'ondemand'
   def_php_opts = {
     'php_admin_value[cgi.fix_pathinfo]' => '0',
     'php_admin_value[expose_php]'       => 'Off',

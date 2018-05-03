@@ -54,10 +54,7 @@ default['php-fpm']['pools'] = [
     #:access_log           => false,
     #:catch_workers_output => 'no',
 
-    #:process_manager => value_for_platform(
-    #  'ubuntu'  => { '10.04' => 'dynamic' },
-    #  'default' => 'ondemand'
-    #),
+    #:process_manager => 'ondemand',
 
     # Only used if process_manager is 'dynamic':
     #:start_servers     => 5,
@@ -91,11 +88,11 @@ default['mariadb']['apt_repository']['base_url'] =
 
 # Use below for AWS SES:
 #default['postfix']['master']['relay']['args'] = []
-#
+
 #default['postfix']['main']['smtp_use_tls']                 = 'yes'
 #default['postfix']['main']['smtp_tls_security_level']      = 'encrypt'
 #default['postfix']['main']['smtp_tls_note_starttls_offer'] = 'yes'
-#
+
 #default['postfix']['main']['smtp_sasl_auth_enable'] = 'yes'
 #override['postfix']['sasl']['smtp_sasl_user_name']  = 'theusername'
 #override['postfix']['sasl']['smtp_sasl_passwd']     = 'thepassword'

@@ -6,9 +6,9 @@ description      'Just a wrapper for setting up PHP-FPM-based apps'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 source_url       'https://github.com/nollieheel/app-php-fpm'
 issues_url       'https://github.com/nollieheel/app-php-fpm/issues'
-version          '0.2.0'
+version          '1.0.0'
 
-depends 'php-fpm', '~> 0.7.9'
+depends 'php-fpm', '~> 0.8.0'
 depends 'mariadb', '~> 1.5.3'
 depends 'postfix', '~> 5.2.1'
 
