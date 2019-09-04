@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Recipe:: php-fpm
 #
-# Copyright (C) 2018, Earth U
+# Copyright (C) 2019, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,9 +27,13 @@ end
 
 # Set derived attribute defaults inside recipe
 
-if node['app-php-fpm']['version'] == '5.6'
-  case node['platform']
-  when 'ubuntu'
+if platform?('ubuntu')
+  if node['app-php-fpm']['version'] == '5.5'
+    if node['platform_version'].to_f > 14.04
+      Chef::Application.fatal!('Unsupported platform for version 5.5')
+    end
+
+  else
     apt_repository 'ondrej-php' do
       uri          'ppa:ondrej/php'
       distribution node['lsb']['codename']
@@ -38,18 +42,17 @@ if node['app-php-fpm']['version'] == '5.6'
       key          'E5267A6C'
     end
 
-    node.default['php-fpm']['conf_file']     = '/etc/php/5.6/fpm/php-fpm.conf'
-    node.default['php-fpm']['conf_dir']      = '/etc/php/5.6/fpm/conf.d'
-    node.default['php-fpm']['pool_conf_dir'] = '/etc/php/5.6/fpm/pool.d'
-    node.default['php-fpm']['package_name']  = 'php5.6-fpm'
-    node.default['php-fpm']['service_name']  = 'php5.6-fpm'
-  else
-    Chef::Application.fatal!("Unsupported platform: #{node['platform']}")
+    v = node['app-php-fpm']['version']
+    node.default['php-fpm']['conf_file']     = "/etc/php/#{v}/fpm/php-fpm.conf"
+    node.default['php-fpm']['conf_dir']      = "/etc/php/#{v}/fpm/conf.d"
+    node.default['php-fpm']['pool_conf_dir'] = "/etc/php/#{v}/fpm/pool.d"
+    node.default['php-fpm']['pid']           = "/var/run/php#{v}-fpm.pid"
+    node.default['php-fpm']['package_name']  = "php#{v}-fpm"
+    node.default['php-fpm']['service_name']  = "php#{v}-fpm"
   end
 end
 
 if node['php-fpm']['pools']
-  def_pm = 'ondemand'
   def_php_opts = {
     'php_admin_value[cgi.fix_pathinfo]' => '0',
     'php_admin_value[expose_php]'       => 'Off',
@@ -64,7 +67,8 @@ if node['php-fpm']['pools']
     pool  = is_hash ? el2 : el1
     pool2 = mash_to_hash(pool)
 
-    pool2['process_manager'] = def_pm unless pool['process_manager']
+    pool2['process_manager'] = 'ondemand' unless pool['process_manager']
+    pool2['max_requests']    = 500 unless pool['max_requests']
     pool2['php_options']     = def_php_opts unless pool['php_options']
 
     node.default['php-fpm']['pools'][key] = pool2
@@ -78,7 +82,9 @@ include_recipe 'php-fpm'
 # For Ubuntu 14.04 Upstart bug where PHP service does not respond
 # well to the reload command.
 # (Or maybe just delete /etc/init.d/php5-fpm?)
-if node['platform'] == 'ubuntu' and node['platform_version'].to_f == 14.04
+if node['app-php-fpm']['version'] == '5.5' &&
+   platform?('ubuntu') &&
+   node['platform_version'].to_f == 14.04
   file '/etc/init/php5-fpm.override' do
     content "reload signal USR2\n"
     action  :create_if_missing

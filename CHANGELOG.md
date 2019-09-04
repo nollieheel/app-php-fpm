@@ -1,3 +1,16 @@
+## 2.0.0 - 2019-09-10
+### Changed
+- Bump dependent versions.
+- Optimized the resource `app_php_fpm_exts` resource by adding support for other PHP versions and node platforms.
+- Included auto-installing PHP extensions in the default recipe.
+
+### Added
+- Support for Ubuntu 16.04
+- Support for PHP 7.x
+
+### Removed
+- Support for Chef 13 and below.
+
 ## 1.0.0 - 2018-05-04
 ### Changed
 - Now depends on php-fpm cookbook v0.8.0.

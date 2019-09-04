@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Attribute:: default
 #
-# Copyright (C) 2018, Earth U
+# Copyright (C) 2019, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,33 +18,28 @@
 # limitations under the License.
 #
 
-default['app-php-fpm']['version'] = '5.6' # or '5.5'
+default['app-php-fpm']['version'] = '5.6'
 default['app-php-fpm']['delete_pool_www'] = true
 
-default['app-php-fpm']['exts']['rhel_only'] = %w{ xml mbstring }
-
-# This array of default php extensions actually
-# does nothing. Use the custom resource app_php_fpm_exts
-# to install extensions in your wrapper cookbook.
-default['app-php-fpm']['exts']['default'] =
+# Install extensions by default
+default['app-php-fpm']['exts'] =
   case node['app-php-fpm']['version'].to_f
   when 5.5
     %w{ mysqlnd cli curl }
-  when 5.6
+  else
     %w{ mysqlnd cli curl zip }
   end
 
-default['php-fpm']['skip_repository_install']     = true
-default['php-fpm']['emergency_restart_threshold'] = '10'
-default['php-fpm']['emergency_restart_interval']  = '1m'
-default['php-fpm']['process_control_timeout']     = '10s'
+# Constant
+default['app-php-fpm']['exts_rhel_only'] = %w{ xml mbstring }
+
 default['php-fpm']['pools'] = [
   {
     # Required attributes:
     :name   => 'example_pool',
     :enable => true,
-    :listen => '127.0.0.1:9000',
-    #:listen => '/var/run/php-fpm.sock',
+    :listen => '/var/run/php-fpm.sock',
+    #:listen => '127.0.0.1:9000',
 
     # Optional attributes with their defaults:
 
@@ -65,10 +60,17 @@ default['php-fpm']['pools'] = [
     #  'php_admin_value[cgi.fix_pathinfo]' => '0',
     #  'php_admin_value[expose_php]'       => 'Off',
     #  'php_value[upload_max_filesize]'    => '10M',
-    #  'php_value[post_max_size]'          => '10M'
+    #  'php_value[post_max_size]'          => '15M'
     #}
   }
 ]
+default['php-fpm']['skip_repository_install']     = true
+# If 10 child processes fail within 1m, restart main php-fpm process:
+default['php-fpm']['emergency_restart_threshold'] = '10'
+default['php-fpm']['emergency_restart_interval']  = '1m'
+# Max grace period for child processes before executing a
+# signal received from parent:
+default['php-fpm']['process_control_timeout']     = '10s'
 
 default['mariadb']['install']['type']             = 'package'
 default['mariadb']['install']['version']          = '10.1'

@@ -4,7 +4,7 @@ A wrapper cookbook that installs PHP-FPM, Mariadb client, and Postfix on a node.
 
 ## Supported Platforms
 
-Ubuntu 14.04
+Ubuntu >=14.04
 
 ## Attributes
 
@@ -18,8 +18,14 @@ Ubuntu 14.04
   <tr>
     <td><tt>['app-php-fpm']['version']</tt></td>
     <td>String</td>
-    <td>Version of PHP-FPM to install. Either '5.5' or '5.6'.</td>
+    <td>Version of PHP-FPM to install.</td>
     <td><tt>'5.6'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['app-php-fpm']['exts']</tt></td>
+    <td>Array</td>
+    <td>PHP extensions to install. Extensions can also be installed manually using the resource `app_php_fpm_exts` as detailed below.</td>
+    <td><tt>`['mysqlnd', 'cli', 'curl', 'zip']`</tt></td>
   </tr>
   <tr>
     <td><tt>['app-php-fpm']['delete_pool_www']</tt></td>

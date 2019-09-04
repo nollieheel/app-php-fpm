@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Recipe:: default
 #
-# Copyright (C) 2018, Earth U
+# Copyright (C) 2019, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,5 +19,7 @@
 #
 
 include_recipe "#{cookbook_name}::php-fpm"
+app_php_fpm_exts node[cookbook_name]['exts']
+
 include_recipe 'mariadb::client'
 include_recipe 'postfix'

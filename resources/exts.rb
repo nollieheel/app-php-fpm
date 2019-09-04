@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Resource:: exts
 #
-# Copyright (C) 2018, Earth U
+# Copyright (C) 2019, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,11 +22,17 @@
 
 property :exts, [Array, String], name_property: true
 property :version, String, default: lazy { node['app-php-fpm']['version'] }
-property :rhel_only, Array, default: lazy { node['app-php-fpm']['exts']['rhel_only'] }
 
 action :install do
 
-  prefix = new_resource.version == '5.6' ? 'php5.6-' : 'php5-'
+  prefix = 'php-'
+  if platform?('ubuntu')
+    if new_resource.version == '5.5'
+      prefix = 'php5-'
+    else
+      prefix = "php#{new_resource.version}-"
+    end
+  end
 
   if new_resource.exts.is_a?(Array)
     exs = new_resource.exts
@@ -37,17 +43,11 @@ action :install do
       exs = [ new_resource.exts ]
     end
   end
-
-  exs.each do |ex|
-    case node['platform']
-    when 'ubuntu'
-      unless new_resource.rhel_only.include?(ex)
-        package "#{prefix}#{ex}"
-      end
-
-    else
-      Chef::Application.fatal!("Unsupported platform: #{node['platform']}")
-    end
+  if not platform_family?('rhel')
+    exs = exs - node['app-php-fpm']['exts_rhel_only']
   end
 
+  exs.each do |ex|
+    package "#{prefix}#{ex}"
+  end
 end
