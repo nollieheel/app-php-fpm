@@ -1,3 +1,10 @@
+## 2.1.0 - 2019-09-13
+### Added
+- Default recipe now installs Composer.
+
+### Removed
+- Attribute `exts_rhel_only` now defaults to empty array. It used to contain `xml` and `mbstring`, but now it looks like those are installable in Ubuntu 16.04 as well.
+
 ## 2.0.0 - 2019-09-10
 ### Changed
 - Bump dependent versions.

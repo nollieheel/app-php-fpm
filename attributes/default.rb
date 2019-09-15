@@ -31,7 +31,10 @@ default['app-php-fpm']['exts'] =
   end
 
 # Constant
-default['app-php-fpm']['exts_rhel_only'] = %w{ xml mbstring }
+default['app-php-fpm']['exts_rhel_only'] = []
+
+# Running the composer recipe auto-runs this recipe:
+default['composer']['php_recipe'] = 'app-php-fpm::php-fpm'
 
 default['php-fpm']['pools'] = [
   {

@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-include_recipe "#{cookbook_name}::php-fpm"
+include_recipe 'composer'
 app_php_fpm_exts node[cookbook_name]['exts']
 
 include_recipe 'mariadb::client'
