@@ -1,6 +1,6 @@
 #
 # Author:: Earth U (<iskitingbords @ gmail.com>)
-# Cookbook Name:: app-php-fpm
+# Cookbook Name:: test
 # Recipe:: default
 #
 # Copyright (C) 2020, Earth U
@@ -18,15 +18,23 @@
 # limitations under the License.
 #
 
-include_recipe 'composer'
-app_php_fpm_exts node[cookbook_name]['exts']
+include_recipe 'app-php-fpm::default'
+package 'nginx-light'
 
-mariadb_repository 'mariadb_repo' do
-  version            node[cookbook_name]['mariadb']['version']
-  apt_repository_uri node[cookbook_name]['mariadb']['repo']
+cookbook_file '/etc/nginx/sites-available/default' do
+  source 'nginx.conf'
 end
 
-mariadb_client_install 'mariadb_client' do
-  version    node[cookbook_name]['mariadb']['version']
-  setup_repo false
+service 'nginx' do
+  action :restart
+end
+
+directory '/var/www' do
+  recursive true
+end
+
+file '/var/www/index.php' do
+  content '<?php phpinfo(); ?>'
+  owner   'www-data'
+  group   'www-data'
 end

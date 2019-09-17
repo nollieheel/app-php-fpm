@@ -1,7 +1,7 @@
 #
 # Author:: Earth U (<iskitingbords @ gmail.com>)
-# Cookbook Name:: app-php-fpm
-# Recipe:: default
+# Cookbook Name:: test
+# Attribute:: default
 #
 # Copyright (C) 2020, Earth U
 #
@@ -18,15 +18,14 @@
 # limitations under the License.
 #
 
-include_recipe 'composer'
-app_php_fpm_exts node[cookbook_name]['exts']
+default['app-php-fpm']['version'] = '7.2'
+default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip }
+default['app-php-fpm']['mariadb']['version'] = '10.1'
 
-mariadb_repository 'mariadb_repo' do
-  version            node[cookbook_name]['mariadb']['version']
-  apt_repository_uri node[cookbook_name]['mariadb']['repo']
-end
-
-mariadb_client_install 'mariadb_client' do
-  version    node[cookbook_name]['mariadb']['version']
-  setup_repo false
-end
+default['php-fpm']['pools'] = [
+  {
+    :name   => 'test_pool',
+    :enable => true,
+    :listen => '/var/run/php-fpm.sock',
+  }
+]

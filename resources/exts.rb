@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Resource:: exts
 #
-# Copyright (C) 2019, Earth U
+# Copyright (C) 2020, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,9 +42,6 @@ action :install do
     else
       exs = [ new_resource.exts ]
     end
-  end
-  if not platform_family?('rhel')
-    exs = exs - node['app-php-fpm']['exts_rhel_only']
   end
 
   exs.each do |ex|

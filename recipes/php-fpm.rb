@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Recipe:: php-fpm
 #
-# Copyright (C) 2019, Earth U
+# Copyright (C) 2020, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,32 +25,24 @@ def mash_to_hash(mash)
   end
 end
 
+apt_repository 'ondrej-php' do
+  uri          'ppa:ondrej/php'
+  distribution node['lsb']['codename']
+  components   ['main']
+  keyserver    'keyserver.ubuntu.com'
+  key          'E5267A6C'
+end
+
 # Set derived attribute defaults inside recipe
 
-if platform?('ubuntu')
-  if node['app-php-fpm']['version'] == '5.5'
-    if node['platform_version'].to_f > 14.04
-      Chef::Application.fatal!('Unsupported platform for version 5.5')
-    end
+v = node['app-php-fpm']['version']
 
-  else
-    apt_repository 'ondrej-php' do
-      uri          'ppa:ondrej/php'
-      distribution node['lsb']['codename']
-      components   ['main']
-      keyserver    'keyserver.ubuntu.com'
-      key          'E5267A6C'
-    end
-
-    v = node['app-php-fpm']['version']
-    node.default['php-fpm']['conf_file']     = "/etc/php/#{v}/fpm/php-fpm.conf"
-    node.default['php-fpm']['conf_dir']      = "/etc/php/#{v}/fpm/conf.d"
-    node.default['php-fpm']['pool_conf_dir'] = "/etc/php/#{v}/fpm/pool.d"
-    node.default['php-fpm']['pid']           = "/var/run/php#{v}-fpm.pid"
-    node.default['php-fpm']['package_name']  = "php#{v}-fpm"
-    node.default['php-fpm']['service_name']  = "php#{v}-fpm"
-  end
-end
+node.default['php-fpm']['conf_file']     = "/etc/php/#{v}/fpm/php-fpm.conf"
+node.default['php-fpm']['conf_dir']      = "/etc/php/#{v}/fpm/conf.d"
+node.default['php-fpm']['pool_conf_dir'] = "/etc/php/#{v}/fpm/pool.d"
+node.default['php-fpm']['pid']           = "/var/run/php#{v}-fpm.pid"
+node.default['php-fpm']['package_name']  = "php#{v}-fpm"
+node.default['php-fpm']['service_name']  = "php#{v}-fpm"
 
 if node['php-fpm']['pools']
   def_php_opts = {
@@ -78,18 +70,6 @@ end
 # Begin server configuration
 
 include_recipe 'php-fpm'
-
-# For Ubuntu 14.04 Upstart bug where PHP service does not respond
-# well to the reload command.
-# (Or maybe just delete /etc/init.d/php5-fpm?)
-if node['app-php-fpm']['version'] == '5.5' &&
-   platform?('ubuntu') &&
-   node['platform_version'].to_f == 14.04
-  file '/etc/init/php5-fpm.override' do
-    content "reload signal USR2\n"
-    action  :create_if_missing
-  end
-end
 
 if node['app-php-fpm']['delete_pool_www']
   www = "#{node['php-fpm']['pool_conf_dir']}/www.conf"

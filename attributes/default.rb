@@ -3,7 +3,7 @@
 # Cookbook Name:: app-php-fpm
 # Attribute:: default
 #
-# Copyright (C) 2019, Earth U
+# Copyright (C) 2020, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,20 +18,17 @@
 # limitations under the License.
 #
 
-default['app-php-fpm']['version'] = '5.6'
+default['app-php-fpm']['version'] = '7.2'
 default['app-php-fpm']['delete_pool_www'] = true
 
 # Install extensions by default
-default['app-php-fpm']['exts'] =
-  case node['app-php-fpm']['version'].to_f
-  when 5.5
-    %w{ mysqlnd cli curl }
-  else
-    %w{ mysqlnd cli curl zip }
-  end
+default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip }
 
-# Constant
-default['app-php-fpm']['exts_rhel_only'] = []
+# Get repos here: https://downloads.mariadb.org/mariadb/repositories/#mirror=utm
+default['app-php-fpm']['mariadb']['repo'] =
+  'http://nyc2.mirrors.digitalocean.com/mariadb/repo' # 10.1, New York
+  #'http://sfo1.mirrors.digitalocean.com/mariadb/repo' # 10.1, San Francisco
+default['app-php-fpm']['mariadb']['version'] = '10.1'
 
 # Running the composer recipe auto-runs this recipe:
 default['composer']['php_recipe'] = 'app-php-fpm::php-fpm'
@@ -75,23 +72,17 @@ default['php-fpm']['emergency_restart_interval']  = '1m'
 # signal received from parent:
 default['php-fpm']['process_control_timeout']     = '10s'
 
-default['mariadb']['install']['type']             = 'package'
-default['mariadb']['install']['version']          = '10.1'
-default['mariadb']['client']['development_files'] = true
-default['mariadb']['use_default_repository']      = true
-# Get repos here: https://downloads.mariadb.org/mariadb/repositories/#mirror=utm
-default['mariadb']['apt_repository']['base_url'] =
-  'nyc2.mirrors.digitalocean.com/mariadb/repo' # 10.1, New York
-  #'sfo1.mirrors.digitalocean.com/mariadb/repo' # 10.1, San Francisco
-
-# Use below for localhost mailserver:
+# --- Tips for Postfix config ---
+# (depends 'postfix', '~> 5.3.1')
+#
+# If using a localhost mailserver, use the following:
 #default['postfix']['main']['myhostname']    = 'example.com'
 #default['postfix']['main']['mydomain']      = 'example.com'
 #default['postfix']['main']['myorigin']      = '$mydomain'
 #default['postfix']['main']['mydestination'] =
 #  %w{ localhost.localdomain localhost }
 
-# Use below for AWS SES:
+# If using AWS SES, use the following:
 #default['postfix']['master']['relay']['args'] = []
 
 #default['postfix']['main']['smtp_use_tls']                 = 'yes'

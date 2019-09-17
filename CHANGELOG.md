@@ -1,3 +1,14 @@
+## 3.0.0 - 2020-01-19
+## Removed
+- Dependency and installation on postfix.
+- RHEL-related code.
+
+## Changed
+- Bumped mariadb cookbook version to latest.
+
+## Added
+- Inspec tests.
+
 ## 2.1.0 - 2019-09-13
 ### Added
 - Default recipe now installs Composer.
