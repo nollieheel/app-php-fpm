@@ -1,6 +1,6 @@
 # app-php-fpm cookbook
 
-A wrapper cookbook that installs PHP-FPM, Mariadb client, and Postfix on a node.
+A wrapper cookbook that installs PHP-FPM and Mariadb client.
 
 ## Supported Platforms
 
@@ -19,7 +19,7 @@ Ubuntu >=14.04
     <td><tt>['app-php-fpm']['version']</tt></td>
     <td>String</td>
     <td>Version of PHP-FPM to install.</td>
-    <td><tt>'5.6'</tt></td>
+    <td><tt>'7.2'</tt></td>
   </tr>
   <tr>
     <td><tt>['app-php-fpm']['exts']</tt></td>
@@ -32,6 +32,18 @@ Ubuntu >=14.04
     <td>Boolean</td>
     <td>Whether to delete the default pool named 'www'</td>
     <td><tt>true</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['app-php-fpm']['mariadb']['version']</tt></td>
+    <td>String</td>
+    <td>Version of MariaDB client to install.</td>
+    <td><tt>'10.1'</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['app-php-fpm']['mariadb']['repo']</tt></td>
+    <td>String</td>
+    <td>MariaDB repository [location](https://downloads.mariadb.org/mariadb/repositories/#mirror=utm).</td>
+    <td><tt>'http://nyc2.mirrors.digitalocean.com/mariadb/repo'</tt></td>
   </tr>
 </table>
 
