@@ -1,7 +1,7 @@
 #
 # Author:: Earth U (<iskitingbords@gmail.com>)
 # Cookbook Name:: app-php-fpm
-# Recipe:: default
+# Recipe:: mariadb_client
 #
 # Copyright (C) 2020, Earth U
 #
@@ -18,9 +18,12 @@
 # limitations under the License.
 #
 
-include_recipe 'app-php-fpm::php-fpm'
-include_recipe 'app-php-fpm::composer'
+mariadb_repository 'mariadb_repo' do
+  version            node['app-php-fpm']['mariadb']['version']
+  apt_repository_uri node['app-php-fpm']['mariadb']['repo']
+end
 
-php_ext node['app-php-fpm']['exts']
-
-include_recipe 'app-php-fpm::mariadb_client'
+mariadb_client_install 'mariadb_client' do
+  version    node['app-php-fpm']['mariadb']['version']
+  setup_repo false
+end

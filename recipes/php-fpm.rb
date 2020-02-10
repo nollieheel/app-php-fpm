@@ -1,5 +1,5 @@
 #
-# Author:: Earth U (<iskitingbords @ gmail.com>)
+# Author:: Earth U (<iskitingbords@gmail.com>)
 # Cookbook Name:: app-php-fpm
 # Recipe:: php-fpm
 #
@@ -18,65 +18,94 @@
 # limitations under the License.
 #
 
-def mash_to_hash(mash)
-  mash.inject({}) do |acc, (k, v)|
-    acc[k] = v.is_a?(Hash) ? mash_to_hash(v) : v
-    acc
-  end
-end
+# Install repository
 
 apt_repository 'ondrej-php' do
-  uri          'ppa:ondrej/php'
+  uri          node['app-php-fpm']['repo_uri']
   distribution node['lsb']['codename']
   components   ['main']
   keyserver    'keyserver.ubuntu.com'
-  key          'E5267A6C'
+  key          node['app-php-fpm']['repo_key']
 end
 
-# Set derived attribute defaults inside recipe
+# Install package
 
 v = node['app-php-fpm']['version']
 
-node.default['php-fpm']['conf_file']     = "/etc/php/#{v}/fpm/php-fpm.conf"
-node.default['php-fpm']['conf_dir']      = "/etc/php/#{v}/fpm/conf.d"
-node.default['php-fpm']['pool_conf_dir'] = "/etc/php/#{v}/fpm/pool.d"
-node.default['php-fpm']['pid']           = "/var/run/php#{v}-fpm.pid"
-node.default['php-fpm']['package_name']  = "php#{v}-fpm"
-node.default['php-fpm']['service_name']  = "php#{v}-fpm"
+package_name = node['app-php-fpm']['package_name'] || "php#{v}-fpm"
+service_name = node['app-php-fpm']['service_name'] || package_name
 
-if node['php-fpm']['pools']
-  def_php_opts = {
-    'php_admin_value[cgi.fix_pathinfo]' => '0',
-    'php_admin_value[expose_php]'       => 'Off',
-    'php_value[upload_max_filesize]'    => '10M',
-    'php_value[post_max_size]'          => '10M'
-  }
-
-  is_hash = node['php-fpm']['pools'].is_a?(Hash) # either Hash or Array
-  meth = node['php-fpm']['pools'].method( is_hash ? :each : :each_with_index )
-  meth.call do |el1, el2|
-    key   = is_hash ? el1 : el2
-    pool  = is_hash ? el2 : el1
-    pool2 = mash_to_hash(pool)
-
-    pool2['process_manager'] = 'ondemand' unless pool['process_manager']
-    pool2['max_requests']    = 500 unless pool['max_requests']
-    pool2['php_options']     = def_php_opts unless pool['php_options']
-
-    node.default['php-fpm']['pools'][key] = pool2
+package package_name do
+  if node['app-php-fpm']['package_ver']
+    version node['app-php-fpm']['package_ver']
   end
 end
 
-# Begin server configuration
+service(service_name) { action :nothing }
 
-include_recipe 'php-fpm'
+# Configure
 
-if node['app-php-fpm']['delete_pool_www']
-  www = "#{node['php-fpm']['pool_conf_dir']}/www.conf"
-  file 'delete_pool_www' do
-    path     www
-    action   :delete
-    only_if  { ::File.exist?(www) }
-    notifies :restart, 'service[php-fpm]'
-  end
+error_log = node['app-php-fpm']['error_log'] || "/var/log/php#{v}-fpm.log"
+fpm_dir = node['app-php-fpm']['fpm_dir'] || "/etc/php/#{v}/fpm"
+
+poold = "#{fpm_dir}/pool.d"
+confd = "#{fpm_dir}/conf.d"
+conf_file = "#{fpm_dir}/php-fpm.conf"
+unit_file = "/lib/systemd/system/php#{v}-fpm.service"
+
+bin = node['app-php-fpm']['bin'] || "/usr/sbin/php-fpm#{v}"
+pid = node['app-php-fpm']['pid'] || "/run/php/php#{v}-fpm.pid"
+socket = node['app-php-fpm']['socket'] || "/run/php/php#{v}-fpm.sock"
+unix_socket = socket.start_with?('/') ? socket : false
+
+file "#{poold}/www.conf" do
+  action   :delete
+  only_if  { ::File.exist?("#{poold}/www.conf") }
+  notifies :restart, "service[#{service_name}]"
+end
+
+template conf_file do
+  owner 'root'
+  mode  '0644'
+  variables(
+    vars: node['app-php-fpm']['conf'],
+    more_defaults: {
+      pid:       pid,
+      error_log: error_log,
+      poold:     poold,
+    },
+  )
+  notifies :restart, "service[#{service_name}]"
+end
+
+template "#{poold}/#{node['app-php-fpm']['pool'][:name]}.conf" do
+  source 'pool.conf.erb'
+  owner  'root'
+  mode   '0644'
+  variables(
+    vars: node['app-php-fpm']['pool'],
+    more_defaults: {
+      listen: socket,
+    },
+  )
+  notifies :restart, "service[#{service_name}]"
+end
+
+execute 'daemon_reload' do
+  command 'systemctl daemon-reload'
+  action  :nothing
+end
+
+template unit_file do
+  source 'php-fpm.service.erb'
+  owner  'root'
+  mode   '0644'
+  variables(
+    version:     v,
+    pidfile:     pid,
+    bin:         bin,
+    conf_file:   conf_file,
+    unix_socket: unix_socket,
+  )
+  notifies :run, 'execute[daemon_reload]', :immediately
 end

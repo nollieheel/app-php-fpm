@@ -18,14 +18,13 @@
 # limitations under the License.
 #
 
+default['composer']['url'] =
+  'https://getcomposer.org/download/1.9.3/composer.phar'
+
 default['app-php-fpm']['version'] = '7.2'
-default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip }
+default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip mbstring }
 default['app-php-fpm']['mariadb']['version'] = '10.1'
 
-default['php-fpm']['pools'] = [
-  {
-    :name   => 'test_pool',
-    :enable => true,
-    :listen => '/var/run/php-fpm.sock',
-  }
-]
+default['php-fpm']['pool'] = {
+  name: 'test_pool',
+}

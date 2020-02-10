@@ -1,3 +1,16 @@
+## 4.0.0 - 2020-02-14
+## Removed
+- Dependency on cookbook-php-fpm.
+- Dependency on composer.
+- Support for Ubuntu 14.04.
+
+## Changed
+- Rewritten for systemd on Ubuntu >= 16.04 only.
+- PHP-FPM and composer are now installed by this cookbook, not another dependent one.
+- Updated config as approriate for PHP >= 7.x.
+- Renamed resource app_php_fpm_exts to just php_ext and modified the property names.
+- Updated tests.
+
 ## 3.0.0 - 2020-01-19
 ## Removed
 - Dependency and installation on postfix.

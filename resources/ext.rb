@@ -1,7 +1,7 @@
 #
-# Author:: Earth U (<iskitingbords @ gmail.com>)
+# Author:: Earth U (<iskitingbords@gmail.com>)
 # Cookbook Name:: app-php-fpm
-# Resource:: exts
+# Resource:: ext
 #
 # Copyright (C) 2020, Earth U
 #
@@ -20,31 +20,32 @@
 
 # Install PHP extensions
 
-property :exts, [Array, String], name_property: true
-property :version, String, default: lazy { node['app-php-fpm']['version'] }
+resource_name :php_ext
+default_action :install
+
+property :name, [Array, String], name_property: true
+property :php_version, String, default: lazy { node['app-php-fpm']['version'] }
+
+action_class do
+  def get_names
+    if new_resource.name.is_a?(Array)
+      new_resource.name
+    else
+      new_resource.name.split(' ')
+    end
+  end
+end
 
 action :install do
-
-  prefix = 'php-'
-  if platform?('ubuntu')
-    if new_resource.version == '5.5'
-      prefix = 'php5-'
-    else
-      prefix = "php#{new_resource.version}-"
-    end
+  get_names().each do |n|
+    package "php#{new_resource.php_version}-#{n}"
   end
+end
 
-  if new_resource.exts.is_a?(Array)
-    exs = new_resource.exts
-  else
-    if new_resource.exts.count(',') > 0
-      exs = new_resource.exts.delete(' ').split(',')
-    else
-      exs = [ new_resource.exts ]
+action :remove do
+  get_names().each do |n|
+    package "php#{new_resource.php_version}-#{n}" do
+      action :remove
     end
-  end
-
-  exs.each do |ex|
-    package "#{prefix}#{ex}"
   end
 end

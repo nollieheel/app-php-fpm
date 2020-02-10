@@ -1,7 +1,7 @@
 #
 # Author:: Earth U (<iskitingbords@gmail.com>)
 # Cookbook Name:: app-php-fpm
-# Recipe:: default
+# Recipe:: composer
 #
 # Copyright (C) 2020, Earth U
 #
@@ -18,9 +18,11 @@
 # limitations under the License.
 #
 
-include_recipe 'app-php-fpm::php-fpm'
-include_recipe 'app-php-fpm::composer'
+# Inspired by https://github.com/djoos-cookbooks/composer
 
-php_ext node['app-php-fpm']['exts']
-
-include_recipe 'app-php-fpm::mariadb_client'
+cfile = "#{node['app-php-fpm']['composer']['install_dir']}/composer"
+remote_file cfile do
+  source node['app-php-fpm']['composer']['url']
+  mode   '0755'
+  not_if { ::File.exist?(cfile) }
+end
