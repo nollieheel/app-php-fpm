@@ -24,22 +24,34 @@ Ubuntu >=16.04
     <td><tt>'7.3'</tt></td>
   </tr>
   <tr>
-    <td><tt>['app-php-fpm']['package_ver']</tt></td>
-    <td>String</td>
-    <td>Specific version of the apt package to install (Optional).</td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
     <td><tt>['app-php-fpm']['conf']</tt></td>
     <td>Hash</td>
     <td>Contains most of the property values for the file php-fpm.conf. Reasonable defaults have been set. See the attributes file.</td>
     <td><tt>See attribute file</tt></td>
   </tr>
   <tr>
+    <td><tt>['app-php-fpm']['pid']</tt></td>
+    <td>String</td>
+    <td>Absolute location of pidfile.</td>
+    <td><tt>"/run/php/php{version}-fpm.pid"</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['app-php-fpm']['error_log']</tt></td>
+    <td>String</td>
+    <td>Absolute location of PHP-FPM log file.</td>
+    <td><tt>"/var/log/php{version}-fpm.log"</tt></td>
+  </tr>
+  <tr>
     <td><tt>['app-php-fpm']['pool']</tt></td>
     <td>Hash</td>
     <td>Contains most of the property values for the php-fpm pool. Only the pool 'name' property is mandatory here. The rest have been set to reasonable defaults.</td>
     <td><tt>See attribute file</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['app-php-fpm']['socket']</tt></td>
+    <td>String</td>
+    <td>Listening socket location (Unix: '/path/to/file.sock', TCP: '127.0.0.1:9000').</td>
+    <td><tt>"/run/php/php{version}-fpm.sock"</tt></td>
   </tr>
   <tr>
     <td><tt>['app-php-fpm']['exts']</tt></td>

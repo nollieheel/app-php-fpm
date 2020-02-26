@@ -30,6 +30,11 @@ default['app-php-fpm']['repo_key'] = value_for_platform(
 )
 
 # A specific package version can be specified here:
+#
+# In most Ubuntu PPAs, including ondrej/ppa, older package versions
+# are not archived. They are, instead, removed completely. Hence,
+# the 'package_ver' node property may not be so useful, and it is
+# best to just leave it undefined.
 #default['app-php-fpm']['package_ver'] = '7.3.14-6+ubuntu16.04.1+deb.sury.org+1'
 
 default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip }
