@@ -1,20 +1,18 @@
-# # encoding: utf-8
-
 describe command('composer --version') do
-  its('stdout') { should match /Composer version 1\.9\.3/ }
+  its('stdout') { should match /Composer version 2\.3\.7/ }
 end
 
-describe service('php7.2-fpm.service') do
+describe service('php8.1-fpm.service') do
   it { should be_installed }
   it { should be_enabled }
   it { should be_running }
 end
 
-describe file('/run/php/php7.2-fpm.pid') do
+describe file('/run/php/php8.1-fpm.pid') do
   it { should exist }
 end
 
-describe file('/run/php/php7.2-fpm.sock') do
+describe file('/run/php/php8.1-fpm.sock') do
   it { should exist }
   its('type') { should eq :socket }
 end
@@ -24,7 +22,7 @@ describe http('http://localhost') do
 end
 
 %w{
-  mysqlnd
+  mysql
   curl
   zip
   mbstring

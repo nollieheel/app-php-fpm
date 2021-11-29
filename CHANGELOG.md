@@ -1,3 +1,11 @@
+# app_php_fpm CHANGELOG
+
+## 5.0.0 - 2022-06-29
+- Bunch of BREAKING changes
+- Renamed cookbook to `app_php_fpm`
+- Reworked cookbook into a resource-based approach
+- Supports only Ubuntu 20.04
+
 ## 4.0.0 - 2020-02-14
 ## Removed
 - Dependency on cookbook-php-fpm.

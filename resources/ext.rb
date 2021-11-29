@@ -1,9 +1,8 @@
 #
-# Author:: Earth U (<iskitingbords@gmail.com>)
-# Cookbook Name:: app-php-fpm
+# Cookbook:: app_php_fpm
 # Resource:: ext
 #
-# Copyright (C) 2020, Earth U
+# Copyright:: 2022, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,34 +15,43 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
 # Install PHP extensions
 
-resource_name :php_ext
-default_action :install
+provides :php_ext
+unified_mode true
 
-property :name, [Array, String], name_property: true
-property :php_version, String, default: lazy { node['app-php-fpm']['version'] }
+# Example: ['mysql', 'curl', 'zip', 'mbstring']
+property :ext_name, [Array, String],
+         description: 'Name of PHP-FPM extension/s to install. Can also be '\
+                      'a string of multiple ext names separated by comma, '\
+                      'or an array of ext names.',
+         name_property: true
+
+property :php_version, String, required: true,
+         description: 'PHP-PFM version'
 
 action_class do
-  def get_names
-    if new_resource.name.is_a?(Array)
-      new_resource.name
+
+  # If an array of strings is passed as the resource name,
+  # it gets automatically join(', ')-ed.
+  def get_ext_names
+    if new_resource.ext_name.is_a?(Array)
+      new_resource.ext_name.map { |s| s.strip }
     else
-      new_resource.name.split(' ')
+      new_resource.ext_name.split(',').map { |s| s.strip }
     end
   end
 end
 
 action :install do
-  get_names().each do |n|
+  get_ext_names().each do |n|
     package "php#{new_resource.php_version}-#{n}"
   end
 end
 
 action :remove do
-  get_names().each do |n|
+  get_ext_names().each do |n|
     package "php#{new_resource.php_version}-#{n}" do
       action :remove
     end

@@ -1,13 +1,13 @@
-name             'app-php-fpm'
+name             'app_php_fpm'
 maintainer       'Earth U'
-maintainer_email 'iskitingbords @ gmail.com'
-license          'Apache License'
+maintainer_email 'iskitingbords@gmail.com'
+license          'Apache-2.0'
 description      'Just a wrapper for setting up PHP-FPM-based apps'
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 source_url       'https://github.com/nollieheel/app-php-fpm'
 issues_url       'https://github.com/nollieheel/app-php-fpm/issues'
-version          '4.0.0'
+version          '5.0.0'
 
-depends 'mariadb', '~> 3.1.0'
+depends 'mariadb', '~> 5.2.4'
 
-supports 'ubuntu', '16.04'
+chef_version '>= 16.0'
+supports     'ubuntu', '20.04'

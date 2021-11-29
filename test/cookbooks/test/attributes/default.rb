@@ -1,9 +1,8 @@
 #
-# Author:: Earth U (<iskitingbords @ gmail.com>)
-# Cookbook Name:: test
+# Cookbook:: test
 # Attribute:: default
 #
-# Copyright (C) 2020, Earth U
+# Copyright:: 2022, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-default['composer']['url'] =
-  'https://getcomposer.org/download/1.9.3/composer.phar'
+default['test']['php_version']      = '8.1'
+default['test']['composer_version'] = '2.3.7'
+default['test']['mariadb_version']  = '10.8'
+default['test']['php_exts']         = %w{ mysql curl zip mbstring }
 
-default['app-php-fpm']['version'] = '7.2'
-default['app-php-fpm']['exts'] = %w{ mysqlnd cli curl zip mbstring }
-default['app-php-fpm']['mariadb']['version'] = '10.1'
-
-default['php-fpm']['pool'] = {
-  name: 'test_pool',
-}
+default['test']['pool_name'] = 'test_pool'
+default['test']['pool_user'] = 'www-data'

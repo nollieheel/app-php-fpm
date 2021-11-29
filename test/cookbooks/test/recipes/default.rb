@@ -1,9 +1,8 @@
 #
-# Author:: Earth U (<iskitingbords @ gmail.com>)
-# Cookbook Name:: test
+# Cookbook:: test
 # Recipe:: default
 #
-# Copyright (C) 2020, Earth U
+# Copyright:: 2022, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +15,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-include_recipe 'app-php-fpm::default'
+vs = node[cookbook_name]
+
+php_package vs['php_version'] do
+  pool_name vs['pool_name']
+  pool_user vs['pool_user']
+end
+
+php_composer vs['composer_version']
+
+php_ext vs['php_exts'] do
+  php_version vs['php_version']
+end
+
+php_mariadb_client vs['mariadb_version']
+
 package 'nginx-light'
 
 cookbook_file '/etc/nginx/sites-available/default' do
