@@ -32,14 +32,13 @@ property :php_version, String, required: true,
          description: 'PHP-PFM version'
 
 action_class do
-
   # If an array of strings is passed as the resource name,
   # it gets automatically join(', ')-ed.
   def get_ext_names
     if new_resource.ext_name.is_a?(Array)
-      new_resource.ext_name.map { |s| s.strip }
+      new_resource.ext_name.map(&:strip)
     else
-      new_resource.ext_name.split(',').map { |s| s.strip }
+      new_resource.ext_name.split(',').map(&:strip)
     end
   end
 end

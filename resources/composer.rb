@@ -36,11 +36,10 @@ property :install_dir, String,
          default: '/usr/local/bin'
 
 action :install do
-
   cfile = "#{new_resource.install_dir}/composer"
   remote_file cfile do
-    source new_resource.download_url % [new_resource.version]
+    action :create_if_missing
+    source format(new_resource.download_url, new_resource.version)
     mode   '0755'
-    not_if { ::File.exist?(cfile) }
   end
 end

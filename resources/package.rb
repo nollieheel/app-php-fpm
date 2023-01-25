@@ -21,7 +21,7 @@
 provides :php_package
 unified_mode true
 
-property :version, String, equal_to: ['7.4', '8.0', '8.1'],
+property :version, String, equal_to: %w(7.4 8.0 8.1),
          description: 'PHP version to install. '\
                       "Can be either '7.4', '8.0', or '8.1'.",
          name_property: true
@@ -44,20 +44,17 @@ property :conf_error_log, String,
 
 # syslog_facility and syslog_ident are only used if error_log is set to 'syslog'
 property :conf_syslog_facility, [String, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_syslog_ident, [String, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_log_level, [String, nil],
          description: 'Setting in php-fpm conf file',
          default: 'notice'
 
 property :conf_log_limit, [Integer, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_emergency_restart_threshold, [Integer, nil],
          description: 'Setting in php-fpm conf file',
@@ -73,16 +70,13 @@ property :conf_process_control_timeout, [String, Integer, nil],
 
 # process_max is only used for dynamix pm pools
 property :conf_process_max, [Integer, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_rlimit_files, [Integer, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_rlimit_core, [String, Integer, nil],
-         description: 'Setting in php-fpm conf file',
-         default: nil
+         description: 'Setting in php-fpm conf file'
 
 property :conf_events_mechanism, [String, nil],
          description: 'Setting in php-fpm conf file',
@@ -117,7 +111,7 @@ property :pool_listen_allowed_clients, [String, Array, nil],
          description: 'Setting in pool conf file',
          default: '127.0.0.1'
 
-property :pool_pm, equal_to: ['static', 'dynamic', 'ondemand'],
+property :pool_pm, String, equal_to: %w(static dynamic ondemand),
          description: 'Setting in pool conf file',
          default: 'ondemand'
 
@@ -145,8 +139,7 @@ property :pool_pm_max_spare_servers, [Integer, nil],
          default: 35
 
 property :pool_pm_max_spawn_rate, [Integer, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 # Only used when using 'ondemand' pm:
 #   pm_process_idle_timeout
@@ -155,58 +148,45 @@ property :pool_pm_process_idle_timeout, [String, nil],
          default: '10s'
 
 property :pool_pm_status_path, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_pm_status_listen, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_ping_path, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_access_log, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_access_format, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_slowlog, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_request_slowlog_timeout, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_request_slowlog_trace_depth, [Integer, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_request_terminate_timeout, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_request_terminate_timeout_track_finished, [String, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_rlimit_files, [Integer, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
 property :pool_rlimit_core, [String, Integer, nil],
-         description: 'Setting in pool conf file',
-         default: nil
+         description: 'Setting in pool conf file'
 
-property :pool_catch_workers_output, equal_to: ['yes', 'no', nil],
-         description: 'Setting in pool conf file',
-         default: nil
+property :pool_catch_workers_output, [String, nil], equal_to: ['yes', 'no', nil],
+         description: 'Setting in pool conf file'
 
-property :pool_clear_env, equal_to: ['yes', 'no'],
+property :pool_clear_env, String, equal_to: %w(yes no),
          description: 'Setting in pool conf file',
          default: 'yes'
 
@@ -214,7 +194,6 @@ property :pool_php_options, Hash,
          description: 'Hash of additional PHP options in pool conf file'
 
 action_class do
-
   def prop_conf_pid
     if property_is_set?(:conf_pid)
       new_resource.conf_pid
@@ -279,14 +258,13 @@ action_class do
         'php_admin_value[cgi.fix_pathinfo]' => '0',
         'php_admin_value[expose_php]'       => 'off',
         'php_value[upload_max_filesize]'    => '20M',
-        'php_value[post_max_size]'          => '25M'
+        'php_value[post_max_size]'          => '25M',
       }
     end
   end
 end
 
 action :install do
-
   fpm_dir   = "/etc/php/#{new_resource.version}/fpm"
   conf_file = "#{fpm_dir}/php-fpm.conf"
   pool_file = "#{fpm_dir}/pool.d/#{new_resource.pool_name}.conf"
@@ -295,15 +273,14 @@ action :install do
   vstr = {
     '7.4' => '74',
     '8.0' => '80',
-    '8.1' => '81'
+    '8.1' => '81',
   }
 
   apt_repository 'ondrej-php' do
-    uri          new_resource.repo_name
-    distribution node['lsb']['codename']
-    components   ['main']
-    keyserver    'keyserver.ubuntu.com'
-    key          new_resource.repo_key
+    uri        new_resource.repo_name
+    components ['main']
+    keyserver  'keyserver.ubuntu.com'
+    key        new_resource.repo_key
   end
 
   package "php#{new_resource.version}-fpm"
@@ -339,7 +316,7 @@ action :install do
       rlimit_core:      new_resource.conf_rlimit_core,
       events_mechanism: new_resource.conf_events_mechanism,
 
-      poold: "#{fpm_dir}/pool.d",
+      poold: "#{fpm_dir}/pool.d"
     )
   end
 
@@ -388,7 +365,7 @@ action :install do
       catch_workers_output: new_resource.pool_catch_workers_output,
       clear_env:            new_resource.pool_clear_env,
 
-      php_options: prop_pool_php_options,
+      php_options: prop_pool_php_options
     )
   end
 
@@ -396,15 +373,15 @@ action :install do
     Type:       'notify',
     ExecStart:  "/usr/sbin/php-fpm#{new_resource.version} "\
                 "--nodaemonize --fpm-config #{conf_file}",
-    ExecReload: '/bin/kill -USR2 $MAINPID'
+    ExecReload: '/bin/kill -USR2 $MAINPID',
   }
   # If listening on a local unix socket:
   if prop_pool_listen.start_with?('/')
     com = '-/usr/lib/php/php-fpm-socket-helper %s /run/php/php-fpm.sock '\
           "#{pool_file} #{vstr[new_resource.version]}"
 
-    service[:ExecStartPost] = com % ['install']
-    service[:ExecStopPost]  = com % ['remove']
+    service[:ExecStartPost] = format(com, ['install'])
+    service[:ExecStopPost]  = format(com, ['remove'])
   end
 
   unit = {
@@ -427,7 +404,6 @@ action :install do
 end
 
 action :remove do
-
   systemd_unit "php#{new_resource.version}-fpm.service" do
     action [:disable, :delete]
   end

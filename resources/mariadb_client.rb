@@ -21,13 +21,13 @@
 provides :php_mariadb_client
 unified_mode true
 
-property :version, equal_to: ['10.4', '10.5', '10.6', '10.7', '10.8'],
+property :version, String, equal_to: %w(10.4 10.5 10.6 10.7 10.8),
          description: 'MariaDB client version to install',
          name_property: true
 
 # Locations taken from:
 #     https://downloads.mariadb.org/mariadb/repositories/#mirror=utm
-property :repo_region, equal_to: ['east', 'west'],
+property :repo_region, String, equal_to: %w(east west),
          description: "Repo region location. Can be either 'east' or 'west'.",
          default: 'west'
 
@@ -42,7 +42,6 @@ action_class do
 end
 
 action :install do
-
   mariadb_repository 'mariadb_repo' do
     version            new_resource.version
     apt_repository_uri repo_location

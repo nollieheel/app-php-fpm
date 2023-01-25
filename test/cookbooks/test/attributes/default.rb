@@ -2,7 +2,7 @@
 # Cookbook:: test
 # Attribute:: default
 #
-# Copyright:: 2022, Earth U
+# Copyright:: 2023, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 default['test']['php_version']      = '8.1'
 default['test']['composer_version'] = '2.3.7'
 default['test']['mariadb_version']  = '10.8'
-default['test']['php_exts']         = %w{ mysql curl zip mbstring }
+default['test']['php_exts']         = %w(mysql curl zip mbstring)
 
 default['test']['pool_name'] = 'test_pool'
 default['test']['pool_user'] = 'www-data'
