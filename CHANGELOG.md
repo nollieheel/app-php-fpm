@@ -1,5 +1,12 @@
 # app_php_fpm CHANGELOG
 
+## 5.1.0 - 2023-01-26
+### Removed
+- Unnecessary attribute file
+
+### Added
+- Verified support for Ubuntu 22.04
+
 ## 5.0.0 - 2022-06-29
 - Bunch of BREAKING changes
 - Renamed cookbook to `app_php_fpm`

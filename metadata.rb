@@ -5,9 +5,9 @@ license          'Apache-2.0'
 description      'Just a wrapper for setting up PHP-FPM-based apps'
 source_url       'https://github.com/nollieheel/app-php-fpm'
 issues_url       'https://github.com/nollieheel/app-php-fpm/issues'
-version          '5.0.0'
+version          '5.1.0'
 
 depends 'mariadb', '~> 5.2.4'
 
-chef_version '>= 16.0'
-supports     'ubuntu', '20.04'
+chef_version '>= 17.0'
+supports     'ubuntu', '>= 20.04'

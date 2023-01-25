@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: package
 #
-# Copyright:: 2022, Earth U
+# Copyright:: 2023, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 provides :php_package
 unified_mode true
 
-property :version, equal_to: ['7.4', '8.0', '8.1'],
+property :version, String, equal_to: ['7.4', '8.0', '8.1'],
          description: 'PHP version to install. '\
                       "Can be either '7.4', '8.0', or '8.1'.",
          name_property: true
