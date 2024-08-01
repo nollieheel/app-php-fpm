@@ -1,5 +1,16 @@
 # app_php_fpm CHANGELOG
 
+## 6.0.0 - 2024-08-08
+### Removed
+- mariadb resource
+
+### Added
+- Support for Ubuntu 24.04
+- Some OS packages
+
+### Fixed
+- Systemd unit file error
+
 ## 5.1.0 - 2023-01-26
 ### Removed
 - Unnecessary attribute file

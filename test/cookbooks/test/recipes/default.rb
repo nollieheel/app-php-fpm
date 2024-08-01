@@ -2,7 +2,7 @@
 # Cookbook:: test
 # Recipe:: default
 #
-# Copyright:: 2023, Earth U
+# Copyright:: 2024, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,18 +30,19 @@ php_package vs['php_version'] do
   pool_user vs['pool_user']
 end
 
-php_composer vs['composer_version']
-
 php_ext vs['php_exts'] do
   php_version vs['php_version']
 end
 
-php_mariadb_client vs['mariadb_version']
+php_composer vs['composer_version']
 
 package 'nginx-light'
 
-cookbook_file '/etc/nginx/sites-available/default' do
-  source 'nginx.conf'
+template '/etc/nginx/sites-available/default' do
+  source 'nginx.conf.erb'
+  variables(
+    version: vs['php_version']
+  )
 end
 
 service 'nginx' do

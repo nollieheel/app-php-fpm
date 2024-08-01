@@ -22,7 +22,6 @@
 ; Default Value: none
 ; Warning: if you change the value here, you need to modify systemd
 ; service PIDFile= setting to match the value here.
-;pid = /run/php/php8.1-fpm.pid
 pid = <%= @pid %>
 
 ; Error log file
@@ -30,7 +29,6 @@ pid = <%= @pid %>
 ; into a local file.
 ; Note: the default prefix is /var
 ; Default Value: log/php-fpm.log
-;error_log = /var/log/php8.1-fpm.log
 error_log = <%= @error_log %>
 
 ; syslog_facility is used to specify what type of program is logging the
@@ -86,9 +84,7 @@ log_limit = <%= @log_limit %>
 ; of '0' means 'Off'.
 ; Default Value: 0
 ;emergency_restart_threshold = 0
-<% if nil_or_empty?(@emergency_restart_threshold) -%>
-emergency_restart_threshold = 10
-<% else -%>
+<% unless nil_or_empty?(@emergency_restart_threshold) -%>
 emergency_restart_threshold = <%= @emergency_restart_threshold %>
 <% end -%>
 
@@ -99,9 +95,7 @@ emergency_restart_threshold = <%= @emergency_restart_threshold %>
 ; Default Unit: seconds
 ; Default Value: 0
 ;emergency_restart_interval = 0
-<% if nil_or_empty?(@emergency_restart_interval) -%>
-emergency_restart_interval = 1m
-<% else -%>
+<% unless nil_or_empty?(@emergency_restart_interval) -%>
 emergency_restart_interval = <%= @emergency_restart_interval %>
 <% end -%>
 
@@ -110,9 +104,7 @@ emergency_restart_interval = <%= @emergency_restart_interval %>
 ; Default Unit: seconds
 ; Default Value: 0
 ;process_control_timeout = 0
-<% if nil_or_empty?(@process_control_timeout) -%>
-process_control_timeout = 10s
-<% else -%>
+<% unless nil_or_empty?(@process_control_timeout) -%>
 process_control_timeout = <%= @process_control_timeout %>
 <% end -%>
 
@@ -163,7 +155,7 @@ rlimit_core = <%= @rlimit_core %>
 ; Default Value: not set (auto detection)
 ;events.mechanism = epoll
 <% unless nil_or_empty?(@events_mechanism) -%>
-events.mechanism = <%= @events_mechanism%>
+events.mechanism = <%= @events_mechanism %>
 <% end -%>
 
 ; When FPM is built with systemd integration, specify the interval,
@@ -189,5 +181,4 @@ events.mechanism = <%= @events_mechanism%>
 ; Relative path can also be used. They will be prefixed by:
 ;  - the global prefix if it's been set (-p argument)
 ;  - /usr otherwise
-;include=/etc/php/8.1/fpm/pool.d/*.conf
 include=<%= @poold %>/*.conf

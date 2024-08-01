@@ -1,5 +1,5 @@
 upstream test_upstream {
-    server unix:/run/php/php8.1-fpm.sock;
+    server unix:/run/php/php<%= @version %>-fpm.sock;
 }
 
 server {

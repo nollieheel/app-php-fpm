@@ -36,7 +36,3 @@ v['php_exts'].each do |x|
     its('exit_status') { should eq 0 }
   end
 end
-
-describe command('mysql') do
-  it { should exist }
-end

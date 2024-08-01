@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: ext
 #
-# Copyright:: 2023, Earth U
+# Copyright:: 2024, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

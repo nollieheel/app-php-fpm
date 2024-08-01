@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: package
 #
-# Copyright:: 2023, Earth U
+# Copyright:: 2024, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,18 +21,10 @@
 provides :php_package
 unified_mode true
 
-property :version, String, equal_to: %w(7.4 8.0 8.1),
+property :version, String, equal_to: %w(7.4 8.0 8.1 8.2 8.3),
          description: 'PHP version to install. '\
-                      "Can be either '7.4', '8.0', or '8.1'.",
+                      "Can be one of: '7.4', '8.0', '8.1', '8.2', '8.3'",
          name_property: true
-
-property :repo_name, String,
-         description: "Ondrej Sury's PHP repo name for Ubuntu",
-         default: 'ppa:ondrej/php'
-
-property :repo_key, String,
-         description: 'Key of the PHP repo',
-         default: 'E5267A6C'
 
 property :conf_pid, String,
          description: 'Setting in php-fpm conf file. '\
@@ -84,7 +76,8 @@ property :conf_events_mechanism, [String, nil],
 
 property :pool_name, String,
          description: 'Setting in pool conf file',
-         default: 'www'
+         callbacks: { 'must not be www' => ->(p) { p != 'www' } },
+         default: 'exampool'
 
 property :pool_user, String,
          description: "Setting in pool conf file. Defaults to: 'www-data'.",
@@ -94,20 +87,21 @@ property :pool_group, String,
          description: 'Setting in pool conf file. Defaults to: :pool_user.'
 
 property :pool_listen, String,
-         description: 'Setting in pool conf file'
+         description: 'Setting in pool conf file. '\
+                      "Defaults to: '/run/php/php{version}-fpm.sock'."
 
 property :pool_listen_owner, String,
-         description: 'Setting in pool conf file'
+         description: 'Setting in pool conf file. Defaults to: :pool_user.'
 
 property :pool_listen_group, String,
-         description: 'Setting in pool conf file'
+         description: 'Setting in pool conf file. Defaults to: :pool_group.'
 
 property :pool_listen_mode, String,
          description: 'Setting in pool conf file',
          default: '0660'
 
 # listen_allowed_clients is only used if pool listens on a TCP socket
-property :pool_listen_allowed_clients, [String, Array, nil],
+property :pool_listen_allowed_clients, [String, Array],
          description: 'Setting in pool conf file',
          default: '127.0.0.1'
 
@@ -121,11 +115,13 @@ property :pool_pm_max_children, Integer,
 
 property :pool_pm_max_requests, Integer,
          description: 'Setting in pool conf file',
-         default: 500
+         default: 400
 
 # Only used when using 'dynamic' pm:
-#   pm_start_servers   pm_min_spare_servers
-#   pm_max_spawn_rate  pm_max_spare_servers
+#   pm_start_servers
+#   pm_min_spare_servers
+#   pm_max_spare_servers
+#   pm_max_spawn_rate
 property :pool_pm_start_servers, [Integer, nil],
          description: 'Setting in pool conf file',
          default: 5
@@ -156,11 +152,18 @@ property :pool_pm_status_listen, [String, nil],
 property :pool_ping_path, [String, nil],
          description: 'Setting in pool conf file'
 
+property :pool_ping_response, [String, nil],
+         description: 'Setting in pool conf file'
+
 property :pool_access_log, [String, nil],
          description: 'Setting in pool conf file'
 
 property :pool_access_format, [String, nil],
          description: 'Setting in pool conf file'
+
+property :pool_access_suppress_path, [String, Array],
+         description: 'Setting in pool conf file',
+         default: []
 
 property :pool_slowlog, [String, nil],
          description: 'Setting in pool conf file'
@@ -191,105 +194,56 @@ property :pool_clear_env, String, equal_to: %w(yes no),
          default: 'yes'
 
 property :pool_php_options, Hash,
-         description: 'Hash of additional PHP options in pool conf file'
+         description: 'Hash of additional PHP options in pool conf file',
+         default: {
+           'php_admin_value[cgi.fix_pathinfo]' => '0',
+           'php_admin_value[expose_php]'       => 'off',
+           'php_value[upload_max_filesize]'    => '20M',
+           'php_value[post_max_size]'          => '25M',
+         }
 
 action_class do
-  def prop_conf_pid
-    if property_is_set?(:conf_pid)
-      new_resource.conf_pid
-    else
-      "/run/php/php#{new_resource.version}-fpm.pid"
-    end
+  def getdef(prop, default)
+    property_is_set?(prop) ? new_resource.send(prop) : default
   end
 
-  def prop_conf_error_log
-    if property_is_set?(:conf_error_log)
-      new_resource.conf_error_log
-    else
-      "/var/log/php#{new_resource.version}-fpm.log"
-    end
-  end
-
-  def prop_pool_group
-    if property_is_set?(:pool_group)
-      new_resource.pool_group
-    else
-      new_resource.pool_user
-    end
-  end
-
-  def prop_pool_listen
-    if property_is_set?(:pool_listen)
-      new_resource.pool_listen
-    else
-      "/run/php/php#{new_resource.version}-fpm.sock"
-    end
-  end
-
-  def prop_pool_listen_owner
-    if property_is_set?(:pool_listen_owner)
-      new_resource.pool_listen_owner
-    else
-      new_resource.pool_user
-    end
-  end
-
-  def prop_pool_listen_group
-    if property_is_set?(:pool_listen_group)
-      new_resource.pool_listen_group
-    else
-      prop_pool_group
-    end
-  end
-
-  def prop_pool_listen_allowed_clients
-    if new_resource.pool_listen_allowed_clients.is_a?(Array)
-      new_resource.pool_listen_allowed_clients.join(',')
-    else
-      new_resource.pool_listen_allowed_clients
-    end
-  end
-
-  def prop_pool_php_options
-    if property_is_set?(:pool_php_options)
-      new_resource.pool_php_options
-    else
-      {
-        'php_admin_value[cgi.fix_pathinfo]' => '0',
-        'php_admin_value[expose_php]'       => 'off',
-        'php_value[upload_max_filesize]'    => '20M',
-        'php_value[post_max_size]'          => '25M',
-      }
-    end
+  def unit_name
+    "php#{new_resource.version}-fpm.service"
   end
 end
 
 action :install do
-  fpm_dir   = "/etc/php/#{new_resource.version}/fpm"
-  conf_file = "#{fpm_dir}/php-fpm.conf"
-  pool_file = "#{fpm_dir}/pool.d/#{new_resource.pool_name}.conf"
-  unit_name = "php#{new_resource.version}-fpm.service"
+  if node['platform_version'] == '22.04'
+    add_apt 'ondrej-php' do
+      key        'B8DC7E53946656EFBCE4C1DD71DAEAAB4AD4CAB6'
+      uri        'https://ppa.launchpadcontent.net/ondrej/php/ubuntu'
+      components ['main']
+    end
 
-  vstr = {
-    '7.4' => '74',
-    '8.0' => '80',
-    '8.1' => '81',
-  }
-
-  apt_repository 'ondrej-php' do
-    uri        new_resource.repo_name
-    components ['main']
-    keyserver  'keyserver.ubuntu.com'
-    key        new_resource.repo_key
+  elsif node['platform_version'] == '24.04'
+    # As of Chef Infra 18.5.0, the apt_repository resource will still use
+    # the deprecated integrated keys method in Ubuntu 24.04.
+    #
+    # We use the apt-add-repository command, instead:
+    execute 'apt-add-repository ppa:ondrej/php'
   end
 
   package "php#{new_resource.version}-fpm"
+  package %w(zip unzip 7zip)
+
+  fpm_dir   = "/etc/php/#{new_resource.version}/fpm"
+  conf_file = "#{fpm_dir}/php-fpm.conf"
+  pool_file = "#{fpm_dir}/pool.d/#{new_resource.pool_name}.conf"
 
   file "#{fpm_dir}/pool.d/www.conf" do
-    action   :delete
-    only_if  { ::File.exist?("#{fpm_dir}/pool.d/www.conf") }
-    notifies :reload_or_restart, "systemd_unit[#{unit_name}]"
+    action  :delete
+    only_if { ::File.exist?("#{fpm_dir}/pool.d/www.conf") }
   end
+
+  prop_conf_pid =
+    getdef(:conf_pid, "/run/php/php#{new_resource.version}-fpm.pid")
+  prop_conf_error_log =
+    getdef(:conf_error_log, "/var/log/php#{new_resource.version}-fpm.log")
 
   template conf_file do
     cookbook 'app_php_fpm'
@@ -297,7 +251,7 @@ action :install do
     owner    'root'
     group    'root'
     mode     '0644'
-    notifies :reload_or_restart, "systemd_unit[#{unit_name}]"
+    notifies :restart, "systemd_unit[#{unit_name}]"
     variables(
       pid:       prop_conf_pid,
       error_log: prop_conf_error_log,
@@ -316,9 +270,15 @@ action :install do
       rlimit_core:      new_resource.conf_rlimit_core,
       events_mechanism: new_resource.conf_events_mechanism,
 
-      poold: "#{fpm_dir}/pool.d"
+      poold: ::File.dirname(pool_file)
     )
   end
+
+  prop_pool_group        = getdef(:pool_group, new_resource.pool_user)
+  prop_pool_listen_owner = getdef(:pool_listen_owner, new_resource.pool_user)
+  prop_pool_listen_group = getdef(:pool_listen_group, prop_pool_group)
+  prop_pool_listen       =
+    getdef(:pool_listen, "/run/php/php#{new_resource.version}-fpm.sock")
 
   template pool_file do
     cookbook 'app_php_fpm'
@@ -326,7 +286,7 @@ action :install do
     owner    'root'
     group    'root'
     mode     '0644'
-    notifies :reload_or_restart, "systemd_unit[#{unit_name}]"
+    notifies :restart, "systemd_unit[#{unit_name}]"
     variables(
       name:  new_resource.pool_name,
       user:  new_resource.pool_user,
@@ -336,7 +296,7 @@ action :install do
       listen_owner:           prop_pool_listen_owner,
       listen_group:           prop_pool_listen_group,
       listen_mode:            new_resource.pool_listen_mode,
-      listen_allowed_clients: prop_pool_listen_allowed_clients,
+      listen_allowed_clients: new_resource.pool_listen_allowed_clients,
 
       pm:                      new_resource.pool_pm,
       pm_max_children:         new_resource.pool_pm_max_children,
@@ -350,9 +310,11 @@ action :install do
       pm_status_path:   new_resource.pool_pm_status_path,
       pm_status_listen: new_resource.pool_pm_status_listen,
       ping_path:        new_resource.pool_ping_path,
+      ping_response:    new_resource.pool_ping_response,
 
       access_log:                  new_resource.pool_access_log,
       access_format:               new_resource.pool_access_format,
+      access_suppress_path:        new_resource.pool_access_suppress_path,
       slowlog:                     new_resource.pool_slowlog,
       request_slowlog_timeout:     new_resource.pool_request_slowlog_timeout,
       request_slowlog_trace_depth: new_resource.pool_request_slowlog_trace_depth,
@@ -365,7 +327,7 @@ action :install do
       catch_workers_output: new_resource.pool_catch_workers_output,
       clear_env:            new_resource.pool_clear_env,
 
-      php_options: prop_pool_php_options
+      php_options: new_resource.pool_php_options
     )
   end
 
@@ -374,14 +336,16 @@ action :install do
     ExecStart:  "/usr/sbin/php-fpm#{new_resource.version} "\
                 "--nodaemonize --fpm-config #{conf_file}",
     ExecReload: '/bin/kill -USR2 $MAINPID',
+    Restart:    'on-failure',
   }
+
   # If listening on a local unix socket:
   if prop_pool_listen.start_with?('/')
     com = '-/usr/lib/php/php-fpm-socket-helper %s /run/php/php-fpm.sock '\
-          "#{pool_file} #{vstr[new_resource.version]}"
+          "#{pool_file} #{new_resource.version.delete('.')}"
 
-    service[:ExecStartPost] = format(com, ['install'])
-    service[:ExecStopPost]  = format(com, ['remove'])
+    service[:ExecStartPost] = com % 'install'
+    service[:ExecStopPost]  = com % 'remove'
   end
 
   unit = {
@@ -404,7 +368,7 @@ action :install do
 end
 
 action :remove do
-  systemd_unit "php#{new_resource.version}-fpm.service" do
+  systemd_unit unit_name do
     action [:disable, :delete]
   end
 

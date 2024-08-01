@@ -5,21 +5,26 @@ driver:
 provisioner:
   name: chef_infra
   product_name: chef
-  product_version: "18.1"
+  product_version: "18.5.0"
   chef_license: accept
 
 verifier:
   name: inspec
 
 platforms:
-  # Ubuntu 20.04 Focal:
-  - name: foc
   # Ubuntu 22.04 Jammy:
   - name: jam
+  # Ubuntu 24.04 Noble:
+  - name: nob
 
 suites:
   - name: default
-    attributes:
     verifier:
       inspec_tests:
         - test/integration/default
+    attributes:
+      test:
+        #php_version: '8.3'
+        php_version: '7.4'
+        #composer_version: '2.7.7'
+        composer_version: '2.7.0'

@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: composer
 #
-# Copyright:: 2023, Earth U
+# Copyright:: 2024, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 provides :php_composer
 unified_mode true
 
-# Usually: '1.9.3', '1.10.23', or the latest '2.3.7'
+# Usually: '1.9.3', '1.10.27', or the latest '2.7.7'
 property :version, String,
          description: 'Version of Composer to install',
          name_property: true
@@ -36,8 +36,7 @@ property :install_dir, String,
          default: '/usr/local/bin'
 
 action :install do
-  cfile = "#{new_resource.install_dir}/composer"
-  remote_file cfile do
+  remote_file "#{new_resource.install_dir}/composer" do
     action :create_if_missing
     source format(new_resource.download_url, new_resource.version)
     mode   '0755'
