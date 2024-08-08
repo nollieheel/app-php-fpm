@@ -24,7 +24,5 @@ suites:
         - test/integration/default
     attributes:
       test:
-        #php_version: '8.3'
-        php_version: '7.4'
-        #composer_version: '2.7.7'
-        composer_version: '2.7.0'
+        php_version: '8.3'
+        composer_version: '2.7.7'
