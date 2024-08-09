@@ -41,6 +41,6 @@ action :configure do
     # the deprecated integrated keys method in Ubuntu 24.04.
     #
     # We use the apt-add-repository command, instead:
-    execute 'apt-add-repository %sppa:ondrej/php' % f
+    execute format('apt-add-repository %sppa:ondrej/php', f)
   end
 end
