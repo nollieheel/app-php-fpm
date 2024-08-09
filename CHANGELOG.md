@@ -1,5 +1,9 @@
 # app_php_fpm CHANGELOG
 
+## 6.1.0 - 2024-08-09
+### Added
+- Option to install the repo (separate resource)
+
 ## 6.0.0 - 2024-08-08
 ### Removed
 - mariadb resource

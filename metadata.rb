@@ -5,7 +5,7 @@ license          'Apache-2.0'
 description      'Just a wrapper for setting up PHP-FPM-based apps'
 source_url       'https://github.com/nollieheel/app-php-fpm'
 issues_url       'https://github.com/nollieheel/app-php-fpm/issues'
-version          '6.0.0'
+version          '6.1.0'
 
 depends 'app_add_apt', '~> 1.0.0'
 

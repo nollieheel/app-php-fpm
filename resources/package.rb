@@ -26,6 +26,10 @@ property :version, String, equal_to: %w(7.4 8.0 8.1 8.2 8.3),
                       "Can be one of: '7.4', '8.0', '8.1', '8.2', '8.3'",
          name_property: true
 
+property :install_repo, [true, false],
+         description: 'Whether or not to set up PHP-FPM repo',
+         default: true
+
 property :conf_pid, String,
          description: 'Setting in php-fpm conf file. '\
                       "Defaults to: '/run/php/php{version}-fpm.pid'."
@@ -213,19 +217,8 @@ action_class do
 end
 
 action :install do
-  if node['platform_version'] == '22.04'
-    add_apt 'ondrej-php' do
-      key        'B8DC7E53946656EFBCE4C1DD71DAEAAB4AD4CAB6'
-      uri        'https://ppa.launchpadcontent.net/ondrej/php/ubuntu'
-      components ['main']
-    end
-
-  elsif node['platform_version'] == '24.04'
-    # As of Chef Infra 18.5.0, the apt_repository resource will still use
-    # the deprecated integrated keys method in Ubuntu 24.04.
-    #
-    # We use the apt-add-repository command, instead:
-    execute 'apt-add-repository ppa:ondrej/php'
+  if new_resource.install_repo
+    php_repo 'app_php_fpm_repo'
   end
 
   package "php#{new_resource.version}-fpm"
