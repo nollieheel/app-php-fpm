@@ -1,5 +1,13 @@
 # app_php_fpm CHANGELOG
 
+## 7.0.0 - 2026-10-26
+### Changed
+- Now only supports PHP 8.3, 8.4, and 8.5
+- Now only supports Ubuntu 24.04 and 26.04
+
+### Removed
+- Option to install the repo. It will always be installed now.
+
 ## 6.1.0 - 2024-08-09
 ### Added
 - Option to install the repo (separate resource)

@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: package
 #
-# Copyright:: 2024, Earth U
+# Copyright:: 2026, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,14 +21,10 @@
 provides :php_package
 unified_mode true
 
-property :version, String, equal_to: %w(7.4 8.0 8.1 8.2 8.3),
+property :version, String, equal_to: %w(8.3 8.4 8.5),
          description: 'PHP version to install. '\
-                      "Can be one of: '7.4', '8.0', '8.1', '8.2', '8.3'",
+                      "Can be one of: '8.3', '8.4', '8.5'",
          name_property: true
-
-property :install_repo, [true, false],
-         description: 'Whether or not to set up PHP-FPM repo',
-         default: true
 
 property :conf_pid, String,
          description: 'Setting in php-fpm conf file. '\
@@ -217,9 +213,7 @@ action_class do
 end
 
 action :install do
-  if new_resource.install_repo
-    php_repo 'app_php_fpm_repo'
-  end
+  php_repo 'app_php_fpm_repo'
 
   package "php#{new_resource.version}-fpm"
   package %w(zip unzip 7zip)
@@ -330,6 +324,15 @@ action :install do
                 "--nodaemonize --fpm-config #{conf_file}",
     ExecReload: '/bin/kill -USR2 $MAINPID',
     Restart:    'on-failure',
+
+    ProtectSystem:           'full',
+    PrivateDevices:          'true',
+    ProtectKernelModules:    'true',
+    ProtectKernelTunables:   'true',
+    ProtectControlGroups:    'true',
+    RestrictRealtime:        'true',
+    RestrictAddressFamilies: 'AF_INET AF_INET6 AF_NETLINK AF_UNIX',
+    RestrictNamespaces:      'true',
   }
 
   # If listening on a local unix socket:

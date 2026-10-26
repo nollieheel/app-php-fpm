@@ -12,17 +12,17 @@ verifier:
   name: inspec
 
 platforms:
-  # Ubuntu 22.04 Jammy:
-  - name: jam
   # Ubuntu 24.04 Noble:
   - name: nob
+  # Ubuntu 26.04 Raccoon:
+  - name: rac
 
 suites:
   - name: default
     verifier:
       inspec_tests:
         - test/integration/default
-    attributes:
-      test:
-        php_version: '8.3'
-        composer_version: '2.7.7'
+#    attributes:
+#      test:
+#        php_version: '8.5'
+#        composer_version: '2.2.30'

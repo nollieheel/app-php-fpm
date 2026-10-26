@@ -2,7 +2,7 @@
 # Cookbook:: app_php_fpm
 # Resource:: repo
 #
-# Copyright:: 2024, Earth U
+# Copyright:: 2026, Earth U
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Set up Ondrej's repo
+# Set up the packages.sury.org PHP repository
+# Based on: https://packages.sury.org/php/README.txt
 
 provides :php_repo
 unified_mode true
@@ -26,21 +27,31 @@ property :cache_rebuild, [true, false],
          default: true
 
 action :configure do
-  if node['platform_version'] == '22.04'
-    add_apt 'ondrej-php' do
-      key           'B8DC7E53946656EFBCE4C1DD71DAEAAB4AD4CAB6'
-      uri           'https://ppa.launchpadcontent.net/ondrej/php/ubuntu'
-      components    ['main']
-      cache_rebuild new_resource.cache_rebuild
-    end
+  # The README installs 'lsb-release', 'ca-certificates', and 'curl' first.
+  # They are not installed here:
+  #   - curl:        replaced by the remote_file resource below
+  #   - lsb-release: replaced by apt_repository's distribution default
+  #                  (the node's LSB codename)
+  #   - ca-certificates: not installed by this resource
+  #
+  # The README's 'apt-get update' commands are also not run here. The
+  # repo cache rebuild is controlled by the :cache_rebuild property.
 
-  elsif node['platform_version'] == '24.04'
-    f = new_resource.cache_rebuild ? '' : '-n '
+  keyring_deb = "#{Chef::Config[:file_cache_path]}/debsuryorg-archive-keyring.deb"
 
-    # As of Chef Infra 18.5.0, the apt_repository resource will still use
-    # the deprecated integrated keys method in Ubuntu 24.04.
-    #
-    # We use the apt-add-repository command, instead:
-    execute format('apt-add-repository %sppa:ondrej/php', f)
+  remote_file keyring_deb do
+    source 'https://packages.sury.org/debsuryorg-archive-keyring.deb'
+  end
+
+  dpkg_package 'debsuryorg-archive-keyring' do
+    source keyring_deb
+  end
+
+  apt_repository 'php' do
+    uri           'https://packages.sury.org/php/'
+    components    ['main']
+    options       ['signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg']
+    keyserver     false
+    cache_rebuild new_resource.cache_rebuild
   end
 end
