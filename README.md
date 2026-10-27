@@ -1,7 +1,7 @@
 # app_php_fpm cookbook
 A cookbook that installs PHP-FPM, extensions, and Composer.
 ## Supported Platforms
-Ubuntu 24.04, 24.04
+Ubuntu 24.04, 26.04
 ## Usage
 This cookbook supplies only resources for other cookbooks to use. There are no recipes. Check the [resources dir](resources/) for more details on the resources themselves.
 ### php_package
